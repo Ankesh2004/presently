@@ -6,22 +6,22 @@ import (
 	"database/sql"
 )
 
-// The Widget modeler
-type Widget struct {
-	ID          int     `json:"id"`
-	Name        string  `json:"name"`
-	Price       float64 `json:"price"`
-	Description string  `json:"description"`
+// The Book model
+type Book struct {
+	ID          int    `json:"id"`
+	Title       string `json:"title"`
+	Author      string `json:"author"`
+	PublishYear int    `json:"publish_year"`
 }
 
-func (w *Widget) getWidget(db *sql.DB) error {
-	return db.QueryRow("SELECT name, price, description FROM widgets WHERE id=$1",
-		w.ID).Scan(&w.Name, &w.Price, &w.Description)
+func (w *Book) getBook(db *sql.DB) error {
+	return db.QueryRow("SELECT id, title, author, publish_year from books WHERE id=$1",
+		w.ID).Scan(&w.ID, &w.Title, &w.Author, &w.PublishYear)
 }
 
-func listWidgets(db *sql.DB, start, count int) ([]Widget, error) {
+func listBooks(db *sql.DB, start, count int) ([]Book, error) {
 	rows, err := db.Query(
-		"SELECT id, name, price, description FROM widgets LIMIT $1 OFFSET $2",
+		"SELECT id, title, author, publish_year FROM books LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -30,15 +30,15 @@ func listWidgets(db *sql.DB, start, count int) ([]Widget, error) {
 
 	defer rows.Close()
 
-	widgets := []Widget{}
+	books := []Book{}
 
 	for rows.Next() {
-		var w Widget
-		if err := rows.Scan(&w.ID, &w.Name, &w.Price, &w.Description); err != nil {
+		var book Book
+		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.PublishYear); err != nil {
 			return nil, err
 		}
-		widgets = append(widgets, w)
+		books = append(books, book)
 	}
 
-	return widgets, nil
+	return books, nil
 }

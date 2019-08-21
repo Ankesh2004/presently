@@ -1,6 +1,7 @@
 package app_test
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -11,10 +12,9 @@ var testApp app.App
 
 // This is a
 func TestMain(m *testing.M) {
+	fmt.Println("Initialize the test app")
 	testApp = app.App{}
 
 	testApp.Initialize()
-	testApp.Run(9998)
-
 	os.Exit(m.Run())
 }

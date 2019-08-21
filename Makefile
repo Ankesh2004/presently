@@ -7,7 +7,7 @@ clean:
 	rm -rf ./bin
 
 test:
-	go test -v ./...
+	go test github.com/dvonlehman/starter-api/app -v
 
 build: clean
 	go build -o ./bin/starter-api ./main.go
