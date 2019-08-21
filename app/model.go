@@ -14,9 +14,20 @@ type Book struct {
 	PublishYear int    `json:"publish_year"`
 }
 
-func (w *Book) getBook(db *sql.DB) error {
-	return db.QueryRow("SELECT id, title, author, publish_year from books WHERE id=$1",
-		w.ID).Scan(&w.ID, &w.Title, &w.Author, &w.PublishYear)
+func getBook(db *sql.DB, id int) (*Book, error) {
+	book := Book{ID: id}
+	err := db.QueryRow("SELECT title, author, publish_year from books WHERE id=$1", id).Scan(&book.Title, &book.Author, &book.PublishYear)
+
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return nil, nil
+		default:
+			return nil, err
+		}
+	}
+
+	return &book, nil
 }
 
 func listBooks(db *sql.DB, start, count int) ([]Book, error) {

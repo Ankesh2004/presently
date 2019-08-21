@@ -23,47 +23,18 @@ func (a *App) initializeRoutes() {
 	fmt.Println("Initialize the app routes")
 	a.Router.HandleFunc("/", RootHandler)
 
-	a.Router.HandleFunc("/hello", HelloHandler).Methods("GET")
-
 	a.Router.HandleFunc("/books", a.ListBooksHandler).Methods("GET")
+	a.Router.HandleFunc("/books/{id:[0-9]+}", a.GetBookHandler).Methods("GET")
 
-	// a.Router.HandleFunc("/widget", a.createProduct).Methods("POST")
-	// a.Router.HandleFunc("/widget/{id:[0-9]+}", a.getProduct).Methods("GET")
-	// a.Router.HandleFunc("/widget/{id:[0-9]+}", a.updateProduct).Methods("PUT")
-	// a.Router.HandleFunc("/widget/{id:[0-9]+}", a.deleteProduct).Methods("DELETE")
+	// a.Router.HandleFunc("/books", a.createBook).Methods("POST")
+	// a.Router.HandleFunc("/books/{id:[0-9]+}", a.updateBook).Methods("PUT")
+	// a.Router.HandleFunc("/books/{id:[0-9]+}", a.deleteBook).Methods("DELETE")
 }
 
 func (a *App) initializeDb() {
 	fmt.Println("Ensure the books table exists")
 	statement, _ := a.Database.Prepare("CREATE TABLE IF NOT EXISTS books (id INTEGER PRIMARY KEY, title TEXT, author TEXT, publish_year NUMERIC)")
 	statement.Exec()
-
-	// var seedBooks = []*Book{
-	// 	&Book{
-	// 		ID:          1,
-	// 		Title:       "Ulysses",
-	// 		Author:      "James Joyce",
-	// 		PublishYear: 1922,
-	// 	},
-	// 	&Book{
-	// 		ID:          2,
-	// 		Title:       "The Great Gatsby",
-	// 		Author:      "F Scott Fitzgerald",
-	// 		PublishYear: 1925,
-	// 	},
-	// 	&Book{
-	// 		ID:          3,
-	// 		Title:       "Moby Dick",
-	// 		Author:      "Herman Melville",
-	// 		PublishYear: 1851,
-	// 	},
-	// 	&Book{
-	// 		ID:          4,
-	// 		Title:       "War and Peace",
-	// 		Author:      "Leo Tolstoy",
-	// 		PublishYear: 1869,
-	// 	},
-	// }
 
 	var seedBooks = SeedData()
 	fmt.Printf("Seed %d book rows in database\n", len(seedBooks))

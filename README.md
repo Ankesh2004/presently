@@ -8,4 +8,3 @@ Starter template for building a Go REST api using mux.
 - https://semaphoreci.com/community/tutorials/building-and-testing-a-rest-api-in-go-with-gorilla-mux-and-postgresql
 - https://medium.com/@benbjohnson/structuring-tests-in-go-46ddee7a25c
 - https://medium.com/@hugo.bjarred/rest-api-with-golang-and-mux-e934f581b8b5
-
