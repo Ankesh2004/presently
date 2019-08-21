@@ -9,7 +9,7 @@ import (
 
 // RootHandler for the root url
 func RootHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "API")
+	fmt.Fprintf(w, "API is running!!!!")
 }
 
 // HelloHandler route handler
@@ -17,7 +17,8 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, 200, map[string]string{"greeting": "Hello"})
 }
 
-func (a *App) ListProductsHandler(w http.ResponseWriter, r *http.Request) {
+// ListWidgetsHandler lists out all the Widgets
+func (a *App) ListWidgetsHandler(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))
 

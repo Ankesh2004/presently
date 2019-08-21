@@ -2,3 +2,4 @@
 bin
 gin-bin
 *.db
+starter-api
