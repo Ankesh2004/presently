@@ -1,4 +1,4 @@
-package app
+package api
 
 // SeedData returns the set of sample books to seed the db with
 func SeedData() []*Book {

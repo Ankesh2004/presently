@@ -1,4 +1,4 @@
-package app
+package api
 
 import (
 	"encoding/json"
@@ -26,7 +26,7 @@ func (a *App) ListBooksHandler(w http.ResponseWriter, r *http.Request) {
 		start = 0
 	}
 
-	books, err := listBooks(a.Database, start, count)
+	books, err := a.DB.listBooks(start, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error fetching book: %s", err.Error()))
 		return
@@ -44,7 +44,7 @@ func (a *App) GetBookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	book, err := getBook(a.Database, id)
+	book, err := a.DB.getBook(id)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Error fetching book: %s", err.Error()))
 		return
@@ -62,7 +62,10 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(response)
+	if _, err := w.Write(response); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Print(w, err.Error())
+	}
 }
 
 // The ErrorResponse struct describes an error JSON returned by the API

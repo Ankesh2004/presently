@@ -1,18 +1,19 @@
-package app_test
+package api_test
 
 import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/dvonlehman/starter-api/app"
+	"example.com/starter-api/api"
 	"gotest.tools/assert"
 )
 
-var seedData = app.SeedData()
+var seedData = api.SeedData()
 
 func TestRootHandler(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/", nil)
@@ -22,7 +23,7 @@ func TestRootHandler(t *testing.T) {
 	assert.Equal(t, string(body), "API is running")
 }
 
-func findBookById(books []*app.Book, id int) *app.Book {
+func findBookById(books []*api.Book, id int) *api.Book {
 	for _, b := range books {
 		if b.ID == id {
 			return b
@@ -31,8 +32,8 @@ func findBookById(books []*app.Book, id int) *app.Book {
 	return nil
 }
 
-func mapToPointers(books []app.Book) []*app.Book {
-	bookPointers := make([]*app.Book, len(books))
+func mapToPointers(books []api.Book) []*api.Book {
+	bookPointers := make([]*api.Book, len(books))
 	for i := range bookPointers {
 		bookPointers[i] = &books[i]
 	}
@@ -46,8 +47,11 @@ func TestGetBookHandler(t *testing.T) {
 
 	assert.Equal(t, response.Code, http.StatusOK)
 
-	book := app.Book{}
-	json.Unmarshal(response.Body.Bytes(), &book)
+	book := api.Book{}
+	err := json.Unmarshal(response.Body.Bytes(), &book)
+	if err != nil {
+		log.Fatal(err)
+	}
 	assert.DeepEqual(t, &book, findBookById(seedData, bookId))
 }
 
@@ -57,9 +61,12 @@ func TestGetBookHandlerNotFound(t *testing.T) {
 	response := executeRequest(req)
 
 	assert.Equal(t, response.Code, http.StatusNotFound)
-	error := app.ErrorResponse{}
+	error := api.ErrorResponse{}
 
-	json.Unmarshal(response.Body.Bytes(), &error)
+	err := json.Unmarshal(response.Body.Bytes(), &error)
+	if err != nil {
+		log.Fatal(err)
+	}
 	assert.Equal(t, error.Error, fmt.Sprintf("Could not find Book with id %d", bookId))
 }
 
@@ -68,8 +75,11 @@ func TestListBooksHandler(t *testing.T) {
 	response := executeRequest(req)
 
 	assert.Equal(t, response.Code, http.StatusOK)
-	books := make([]app.Book, 0)
-	json.Unmarshal(response.Body.Bytes(), &books)
+	books := make([]api.Book, 0)
+	err := json.Unmarshal(response.Body.Bytes(), &books)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Need an array of pointers to the original Book structs to pass to the findBookById func
 	bookPointers := mapToPointers(books)

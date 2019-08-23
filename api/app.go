@@ -1,7 +1,6 @@
-package app
+package api
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
@@ -15,8 +14,8 @@ import (
 
 // The App struct represents the core application object
 type App struct {
-	Router   *mux.Router
-	Database *sql.DB
+	Router *mux.Router
+	DB     Database
 }
 
 func (a *App) initializeRoutes() {
@@ -31,33 +30,14 @@ func (a *App) initializeRoutes() {
 	// a.Router.HandleFunc("/books/{id:[0-9]+}", a.deleteBook).Methods("DELETE")
 }
 
-func (a *App) initializeDb() {
-	fmt.Println("Ensure the books table exists")
-	statement, _ := a.Database.Prepare("CREATE TABLE IF NOT EXISTS books (id INTEGER PRIMARY KEY, title TEXT, author TEXT, publish_year NUMERIC)")
-	statement.Exec()
-
-	var seedBooks = SeedData()
-	fmt.Printf("Seed %d book rows in database\n", len(seedBooks))
-
-	// Insert the test data
-	for _, book := range seedBooks {
-		fmt.Printf("Insert %d into books table\n", book.ID)
-		statement, _ := a.Database.Prepare("INSERT INTO books (id, title, author, publish_year) VALUES (?, ?, ?, ?)")
-		statement.Exec(book.ID, book.Title, book.Author, book.PublishYear)
-	}
-	fmt.Println("Done seeding the database")
-}
-
 // Initialize the app
-// Parameters for one-time app initialization steps passed in here, i.e. db connection args.
-// func (a *App) Initialize(user, password, dbname string) {
-func (a *App) Initialize() {
+func (a *App) Initialize() error {
 	a.Router = mux.NewRouter()
-	database, _ := sql.Open("sqlite3", "./books.db")
-	a.Database = database
-
-	a.initializeDb()
+	if err := a.DB.seedData(); err != nil {
+		return err
+	}
 	a.initializeRoutes()
+	return nil
 }
 
 // Run the app

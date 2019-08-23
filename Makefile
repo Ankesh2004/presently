@@ -7,10 +7,13 @@ clean:
 	rm -rf ./bin
 
 test:
-	go test github.com/dvonlehman/starter-api/app -v
+	go test example.com/starter-api/api -v
 
 build: clean
 	go build -o ./bin/starter-api ./main.go
+
+lint:
+	golangci-lint run
 
 run: build
 	./bin/starter-api 9999

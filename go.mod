@@ -1,4 +1,4 @@
-module github.com/dvonlehman/starter-api
+module example.com/starter-api
 
 go 1.12
 

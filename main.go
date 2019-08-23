@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/dvonlehman/starter-api/app"
+	"example.com/starter-api/api"
 )
 
 func main() {
@@ -13,8 +13,15 @@ func main() {
 	// flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
 	// flag.Parse()
 
-	app := app.App{}
-	app.Initialize()
+	sqldb, err := api.CreateSqliteDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	app := api.App{DB: sqldb}
+	if err := app.Initialize(); err != nil {
+		log.Fatal(err)
+	}
 
 	port, err := strconv.Atoi(os.Args[1])
 	if err != nil {
