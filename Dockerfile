@@ -23,6 +23,7 @@ RUN CGO_ENABLED=0 make build
 
 FROM alpine:3.7 AS run
 COPY --from=build /app/bin/starter-api /bin/starter-api
+ENV PORT=8080
 EXPOSE 8080
 
 ENTRYPOINT [ "/bin/starter-api" ]
