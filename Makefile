@@ -1,13 +1,16 @@
 .PHONY: build run dev test
 
 build-image: build
-	docker build -t starter-api .
+	docker build --target=run -t starter-api .
 
 clean:
 	rm -rf ./bin
 
 test:
 	go test example.com/starter-api/api -v
+
+test-docker:
+	docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
 
 build: clean
 	go build -o ./bin/starter-api ./main.go
