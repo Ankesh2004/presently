@@ -19,7 +19,7 @@ COPY ./go.* ./
 RUN go mod download
 
 COPY . ./
-RUN make build
+RUN CGO_ENABLED=0 make build
 
 FROM alpine:3.7 AS run
 COPY --from=build /app/bin/starter-api /bin/starter-api
