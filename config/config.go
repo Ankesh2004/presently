@@ -1,12 +1,28 @@
 package config
 
-import "os"
+import (
+	"fmt"
+	"os"
+	"sync"
+)
 
 type Config struct {
 	MONGO_URI  string
 	DB_NAME    string
 	JWT_SECRET string
 	API_PORT   string
+}
+
+var (
+	instance *Config
+	once     sync.Once
+)
+
+func InitialiseConfig() {
+	once.Do(func() {
+		instance = LoadConfig()
+		fmt.Println("Config initialized")
+	})
 }
 func LoadConfig() *Config {
 	return &Config{
@@ -17,9 +33,15 @@ func LoadConfig() *Config {
 	}
 }
 func getEnv(key, fallback string) string {
-	val,err:= os.LookupEnv(key)
+	val, err := os.LookupEnv(key)
 	if err {
 		return fallback
 	}
 	return val
+}
+func GetConfig() *Config {
+	if instance == nil {
+		InitialiseConfig()
+	}
+	return instance
 }
