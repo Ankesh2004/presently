@@ -2,4 +2,5 @@
 bin
 gin-bin
 *.db
-starter-api
+*.env
+env

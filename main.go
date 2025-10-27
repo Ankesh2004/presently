@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"example.com/starter-api/api"
+	"presently/api"
 )
 
 func main() {
