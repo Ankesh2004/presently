@@ -21,6 +21,7 @@ type App struct {
 	MongoClient *mongo.Client
 }
 
+// to be used across the application for db operations
 var mongoClientCtx context.Context
 
 func (a *App) initializeRoutes() {
