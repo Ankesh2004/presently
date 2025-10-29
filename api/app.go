@@ -9,6 +9,7 @@ import (
 	"presently/api/handlers"
 	"presently/api/middleware"
 	"presently/api/repository"
+	"presently/config"
 	"time"
 
 	gorillaHandlers "github.com/gorilla/handlers"
@@ -45,7 +46,7 @@ func (a *App) initializeRoutes() {
 		w.Write([]byte("Presently API is running!"))
 	}).Methods("GET")
 
-		// Auth routes
+	// Auth routes
 	a.Router.HandleFunc("/auth/register", authHandler.Register).Methods("POST")
 	a.Router.HandleFunc("/auth/login", authHandler.Login).Methods("POST")
 
@@ -53,21 +54,24 @@ func (a *App) initializeRoutes() {
 	protected := a.Router.PathPrefix("/api").Subrouter()
 	protected.Use(middleware.JWTAuthentication)
 
-		// Classroom routes
+	// Classroom routes
 	protected.HandleFunc("/classroom/create", classroomHandler.CreateClassroom).Methods("POST")
 	protected.HandleFunc("/classroom/join", classroomHandler.JoinClassroom).Methods("POST")
 	protected.HandleFunc("/classroom/my-classes", classroomHandler.GetMyClasses).Methods("GET")
 	protected.HandleFunc("/classroom/leave", classroomHandler.LeaveClassroom).Methods("POST")
 	protected.HandleFunc("/classroom/details", classroomHandler.GetClassroomDetails).Methods("GET")
 
-		// Attendance routes
+	// Attendance routes
 	protected.HandleFunc("/attendance/start", attendanceHandler.StartAttendance).Methods("POST")
 	protected.HandleFunc("/attendance/mark", attendanceHandler.MarkAttendance).Methods("POST")
 	protected.HandleFunc("/attendance/history", attendanceHandler.GetMyHistory).Methods("GET")
 }
 
 // Initialize the app ---> database and routes
-func (a *App) Initialize(mongoURI, dbName string) error {
+func (a *App) Initialize() error {
+	// config for database
+	mongoURI := config.GetConfig().MONGO_URI
+	dbName := config.GetConfig().DB_NAME
 	// initialise database
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	mongoClientCtx = ctx // storing mongo context for performing operations later
@@ -101,13 +105,14 @@ func (a *App) Initialize(mongoURI, dbName string) error {
 }
 
 // Run the app
-func (a *App) Run(port int) error {
+func (a *App) Run() error {
+	port := config.GetConfig().API_PORT
 	fmt.Printf("Run the app on port %d\n", port)
 	loggedRouter := gorillaHandlers.LoggingHandler(os.Stdout, a.Router)
 
-	//Security 
-	allowedHeaders:= gorillaHandlers.AllowedHeaders([]string{"X-Requested-With","Content-Type","Authorization"})
+	//Security
+	allowedHeaders := gorillaHandlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	allowedMethods := gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
 	allowedOrigins := gorillaHandlers.AllowedOrigins([]string{"*"}) // TODO: make specific in production code
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), gorillaHandlers.CORS(allowedHeaders,allowedMethods,allowedOrigins)(loggedRouter))
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), gorillaHandlers.CORS(allowedHeaders, allowedMethods, allowedOrigins)(loggedRouter))
 }
