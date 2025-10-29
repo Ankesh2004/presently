@@ -32,6 +32,17 @@ func (r *ClassroomRepository) GetClassroomById(ctx context.Context, classroomId 
 	}
 	return &classroom, nil
 }
+
+func (r *ClassroomRepository) GetClassroomByCode(ctx context.Context, code string) (*models.Classroom, error) {
+	filter := bson.M{"uniqueCode": code}
+	var classroom models.Classroom
+	err := r.collection.FindOne(ctx, filter).Decode(&classroom)
+	if err != nil {
+		return nil, err
+	}
+	return &classroom, nil
+}
+
 func (r *ClassroomRepository) AddStudentToClassroom(ctx context.Context, classroomId, studentId primitive.ObjectID) error {
 	filter := bson.M{"_id": classroomId}
 	update := bson.M{"$push": bson.M{"studentIds": studentId}}
