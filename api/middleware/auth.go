@@ -4,18 +4,20 @@ import (
 	"context"
 	"net/http"
 	"presently/api/utils"
+	"strings"
 )
 
 func JWTAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-
-		if authHeader == "" || len(string(authHeader)) != 2 || string(authHeader[0]) != "Bearer" {
-			http.Error(w,"Auth header missing",http.StatusUnauthorized)
+		
+		parts := strings.Split(authHeader, " ")
+		if len(parts) != 2 || parts[0] != "Bearer" {
+			http.Error(w, "Auth header missing", http.StatusUnauthorized)
 			return
 		}
 
-		tokenString := string(authHeader[1])
+		tokenString := parts[1]
 		claims, err := utils.ValidateToken(tokenString)
 
 		if err != nil {

@@ -92,12 +92,12 @@ func (h *AttendanceHandler) StartAttendance(w http.ResponseWriter, r *http.Reque
 
 	// QRCodeData === session ID
 	// On the client side , we will scan QRCode to get sesssion ID
-	newSession.QRCodeData = newSession.ID.Hex()
+	qrcodedata := newSession.ID.Hex()
 
 	response := map[string]interface{}{
 		"message":    "Attendance session started successfully",
 		"sessionId":  newSession.ID,
-		"qrCodeData": newSession.QRCodeData,
+		"qrCodeData": qrcodedata,
 		"endTime":    newSession.EndTime,
 	}
 	respondWithJSON(w, http.StatusCreated, response)
