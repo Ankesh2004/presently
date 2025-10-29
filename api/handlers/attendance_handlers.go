@@ -16,6 +16,13 @@ type AttendanceHandler struct {
 	classroomRepo  *repository.ClassroomRepository
 }
 
+func NewAttendanceHandler(attendanceRepo *repository.AttendanceRepository,classroomRepo *repository.ClassroomRepository) *AttendanceHandler{
+	return &AttendanceHandler{
+		attendanceRepo: attendanceRepo,
+		classroomRepo: classroomRepo,
+	}
+}
+
 func (h *AttendanceHandler) StartAttendance(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userId")
 	if userID == nil {

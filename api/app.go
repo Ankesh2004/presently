@@ -6,10 +6,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"presently/api/handlers"
+	"presently/api/middleware"
 	"presently/api/repository"
 	"time"
 
-	"github.com/gorilla/handlers"
+	gorillaHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -31,9 +33,37 @@ var mongoClientCtx context.Context
 
 func (a *App) initializeRoutes() {
 	fmt.Println("Initialize the app routes")
-	// Root
 
-	// Routes
+	// Initialize handlers with repositories
+	authHandler := handlers.NewAuthHandler(userRepo)
+	classroomHandler := handlers.NewClassroomHandler(classroomRepo)
+	attendanceHandler := handlers.NewAttendanceHandler(attendanceRepo, classroomRepo)
+
+	// --- Public routes ---
+	a.Router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Presently API is running!"))
+	}).Methods("GET")
+
+		// Auth routes
+	a.Router.HandleFunc("/auth/register", authHandler.Register).Methods("POST")
+	a.Router.HandleFunc("/auth/login", authHandler.Login).Methods("POST")
+
+	// --- Protected routes ---
+	protected := a.Router.PathPrefix("/api").Subrouter()
+	protected.Use(middleware.JWTAuthentication)
+
+		// Classroom routes
+	protected.HandleFunc("/classroom/create", classroomHandler.CreateClassroom).Methods("POST")
+	protected.HandleFunc("/classroom/join", classroomHandler.JoinClassroom).Methods("POST")
+	protected.HandleFunc("/classroom/my-classes", classroomHandler.GetMyClasses).Methods("GET")
+	protected.HandleFunc("/classroom/leave", classroomHandler.LeaveClassroom).Methods("POST")
+	protected.HandleFunc("/classroom/details", classroomHandler.GetClassroomDetails).Methods("GET")
+
+		// Attendance routes
+	protected.HandleFunc("/attendance/start", attendanceHandler.StartAttendance).Methods("POST")
+	protected.HandleFunc("/attendance/mark", attendanceHandler.MarkAttendance).Methods("POST")
+	protected.HandleFunc("/attendance/history", attendanceHandler.GetMyHistory).Methods("GET")
 }
 
 // Initialize the app ---> database and routes
@@ -73,7 +103,7 @@ func (a *App) Initialize(mongoURI, dbName string) error {
 // Run the app
 func (a *App) Run(port int) error {
 	fmt.Printf("Run the app on port %d\n", port)
-	loggedRouter := handlers.LoggingHandler(os.Stdout, a.Router)
+	loggedRouter := gorillaHandlers.LoggingHandler(os.Stdout, a.Router)
 
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), loggedRouter)
 }

@@ -15,6 +15,13 @@ type AuthHandler struct {
 	userRepo *repository.UserRepository
 }
 
+// constrcutor
+func NewAuthHandler(userRepo *repository.UserRepository) *AuthHandler {
+	return &AuthHandler{
+		userRepo: userRepo,
+	}
+}
+
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Name     string `json:"name"`
@@ -64,7 +71,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		"message": "User registered sucessfully",
 		"email":   newUser.Email,
 	}
-	respondWithJSON(w,http.StatusCreated,response)
+	respondWithJSON(w, http.StatusCreated, response)
 }
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -98,10 +105,10 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwtToken,err:= utils.GenerateJWT(exisitingUser.ID,exisitingUser.Role)
-	if err!=nil{
+	jwtToken, err := utils.GenerateJWT(exisitingUser.ID, exisitingUser.Role)
+	if err != nil {
 		http.Error(w, "Internal server error: failed to generate jwt token", http.StatusInternalServerError)
 		return
 	}
-	respondWithJSON(w,http.StatusCreated,jwtToken)
+	respondWithJSON(w, http.StatusCreated, jwtToken)
 }

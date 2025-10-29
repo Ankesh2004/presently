@@ -14,6 +14,13 @@ type ClassroomHandler struct {
 	classroomRepo *repository.ClassroomRepository
 }
 
+// constructor
+func NewClassroomHandler(classroomRepo *repository.ClassroomRepository) *ClassroomHandler {
+	return &ClassroomHandler{
+		classroomRepo: classroomRepo,
+	}
+}
+
 func (h *ClassroomHandler) CreateClassroom(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userId")
 	if userID == nil {
@@ -63,8 +70,8 @@ func (h *ClassroomHandler) CreateClassroom(w http.ResponseWriter, r *http.Reques
 	}
 
 	response := map[string]interface{}{
-		"message":    "Classroom created successfully",
-		"code":       newClassroom.UniqueCode,
+		"message":     "Classroom created successfully",
+		"code":        newClassroom.UniqueCode,
 		"classroomId": newClassroom.ID,
 	}
 	respondWithJSON(w, http.StatusCreated, response)
@@ -117,8 +124,8 @@ func (h *ClassroomHandler) JoinClassroom(w http.ResponseWriter, r *http.Request)
 	}
 
 	response := map[string]interface{}{
-		"message":      "Successfully joined classroom",
-		"classroomId":  classroom.ID,
+		"message":       "Successfully joined classroom",
+		"classroomId":   classroom.ID,
 		"classroomName": classroom.Name,
 	}
 	respondWithJSON(w, http.StatusOK, response)
@@ -257,4 +264,3 @@ func (h *ClassroomHandler) GetClassroomDetails(w http.ResponseWriter, r *http.Re
 
 	respondWithJSON(w, http.StatusOK, classroom)
 }
-
