@@ -105,5 +105,9 @@ func (a *App) Run(port int) error {
 	fmt.Printf("Run the app on port %d\n", port)
 	loggedRouter := gorillaHandlers.LoggingHandler(os.Stdout, a.Router)
 
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), loggedRouter)
+	//Security 
+	allowedHeaders:= gorillaHandlers.AllowedHeaders([]string{"X-Requested-With","Content-Type","Authorization"})
+	allowedMethods := gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
+	allowedOrigins := gorillaHandlers.AllowedOrigins([]string{"*"}) // TODO: make specific in production code
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), gorillaHandlers.CORS(allowedHeaders,allowedMethods,allowedOrigins)(loggedRouter))
 }
