@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"presently/api/repository"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -20,6 +21,10 @@ type App struct {
 	DB          *mongo.Database
 	MongoClient *mongo.Client
 }
+
+var userRepo *repository.UserRepository
+var attendanceRepo *repository.AttendanceRepository
+var classroomRepo *repository.ClassroomRepository
 
 // to be used across the application for db operations
 var mongoClientCtx context.Context
@@ -55,6 +60,10 @@ func (a *App) Initialize(mongoURI, dbName string) error {
 	a.MongoClient = client
 	a.DB = client.Database(dbName)
 
+	// initialise repository
+	userRepo = repository.NewUserRepository(a.DB)
+	attendanceRepo = repository.NewAttendanceRepository(a.DB)
+	classroomRepo = repository.NewClassroomRepository(a.DB)
 	// initialise routes
 	a.Router = mux.NewRouter() // gorilla mux router
 	a.initializeRoutes()
