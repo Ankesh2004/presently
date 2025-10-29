@@ -74,7 +74,6 @@ func (a *App) Initialize() error {
 	dbName := config.GetConfig().DB_NAME
 	// initialise database
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	mongoClientCtx = ctx // storing mongo context for performing operations later
 	defer cancel()       // cancel if not connected in 10 seconds
 
 	clientOptions := options.Client().ApplyURI(mongoURI)
