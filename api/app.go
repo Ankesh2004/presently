@@ -29,10 +29,8 @@ var userRepo *repository.UserRepository
 var attendanceRepo *repository.AttendanceRepository
 var classroomRepo *repository.ClassroomRepository
 
-// to be used across the application for db operations
-var mongoClientCtx context.Context
-
 func (a *App) initializeRoutes() {
+	// TODO : add rate limits on routes
 	fmt.Println("Initialize the app routes")
 
 	// Initialize handlers with repositories
@@ -106,12 +104,12 @@ func (a *App) Initialize() error {
 // Run the app
 func (a *App) Run() error {
 	port := config.GetConfig().API_PORT
-	fmt.Printf("Run the app on port %d\n", port)
+	fmt.Printf("Run the app on port %s\n", port)
 	loggedRouter := gorillaHandlers.LoggingHandler(os.Stdout, a.Router)
 
 	//Security
 	allowedHeaders := gorillaHandlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	allowedMethods := gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
 	allowedOrigins := gorillaHandlers.AllowedOrigins([]string{"*"}) // TODO: make specific in production code
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), gorillaHandlers.CORS(allowedHeaders, allowedMethods, allowedOrigins)(loggedRouter))
+	return http.ListenAndServe(fmt.Sprintf(":%s", port), gorillaHandlers.CORS(allowedHeaders, allowedMethods, allowedOrigins)(loggedRouter))
 }

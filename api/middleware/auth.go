@@ -10,7 +10,7 @@ func JWTAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 
-		if authHeader == "" || len(authHeader) != 2 || string(authHeader[0]) != "Bearer" {
+		if authHeader == "" || len(string(authHeader)) != 2 || string(authHeader[0]) != "Bearer" {
 			http.Error(w,"Auth header missing",http.StatusUnauthorized)
 			return
 		}

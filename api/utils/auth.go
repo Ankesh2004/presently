@@ -39,7 +39,7 @@ func ValidateToken(tokenString string) (*Claims, error) {
 			return nil, jwt.ErrSignatureInvalid
 		}
 		jwtSecret := config.GetConfig().JWT_SECRET
-		return jwtSecret, nil
+		return []byte(jwtSecret), nil
 	})
 
 	if err != nil {

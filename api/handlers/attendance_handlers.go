@@ -75,6 +75,7 @@ func (h *AttendanceHandler) StartAttendance(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Create attendance session with 5 minutes validity
+	// TODO: store these in a cache like redis
 	startTime := time.Now()
 	endTime := startTime.Add(5 * time.Minute)
 

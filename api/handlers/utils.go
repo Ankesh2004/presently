@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
-	"time"
 )
 
 func respondWithJSON(w http.ResponseWriter, statusCode int, payload any) {
-	response, _ := json.Marshal(payload)
+	response, err := json.Marshal(payload)
+
+	if err!=nil {
+		http.Error(w,"Failed to encode response in JSON",http.StatusInternalServerError)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
@@ -31,8 +34,7 @@ func respondWithError(w http.ResponseWriter, statusCode int, message string) {
 func generateUniqueCode() string {
 	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	const codeLength = 6
-
-	rand.NewSource(time.Now().UnixNano())
+	// Seeding not required as Go 1.20+ has global generator seeding itself
 	code := make([]byte, codeLength)
 	for i := range code {
 		code[i] = charset[rand.Intn(len(charset))]

@@ -47,7 +47,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "user already exists", http.StatusBadRequest)
 		return
 	}
-	// TODO : add email check and strong password validation
+	// TODO : add email regex check and strong password validation
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 
